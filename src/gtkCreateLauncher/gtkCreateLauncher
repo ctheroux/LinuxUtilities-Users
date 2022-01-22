@@ -1,0 +1,90 @@
+#!/usr/bin/python
+
+##########################################################################################
+#
+# Creates a gnome program launcher.
+#
+##########################################################################################
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT
+# HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# IT IS NOT PERMITTED TO MODIFY THIS COMMENT BLOCK.
+#
+# (c)1998-2021, Claude "Tryphon" Theroux, Montreal, Quebec, Canada
+#
+##########################################################################################
+
+import sys
+import gi
+
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
+uiGladeDefinition = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Generated with glade 3.22.2 -->\n<interface><requires lib=\"gtk+\" version=\"3.20\"/><object class=\"GtkDialog\" id=\"MainDialog\"><property name=\"can_focus\">False</property><property name=\"title\" translatable=\"yes\">Create an Application Launcher</property><property name=\"default_width\">640</property><property name=\"default_height\">300</property><property name=\"type_hint\">dialog</property><child type=\"titlebar\"><placeholder/></child><child internal-child=\"vbox\"><object class=\"GtkBox\" id=\"VBOX\"><property name=\"can_focus\">False</property><property name=\"orientation\">vertical</property><property name=\"spacing\">2</property><child internal-child=\"action_area\"><object class=\"GtkButtonBox\"><property name=\"can_focus\">False</property><property name=\"layout_style\">end</property><child><object class=\"GtkButton\" id=\"Cancel\"><property name=\"label\" translatable=\"yes\">Cancel</property><property name=\"visible\">True</property><property name=\"can_focus\">True</property><property name=\"receives_default\">True</property><signal name=\"clicked\" handler=\"on_Cancel_clicked\" swapped=\"no\"/></object><packing><property name=\"expand\">True</property><property name=\"fill\">True</property><property name=\"position\">0</property></packing></child><child><object class=\"GtkButton\" id=\"CREATE_LAUNCHER\"><property name=\"label\" translatable=\"yes\">Create Launcher</property><property name=\"visible\">True</property><property name=\"can_focus\">True</property><property name=\"receives_default\">True</property><signal name=\"clicked\" handler=\"on_create_clicked\" swapped=\"no\"/></object><packing><property name=\"expand\">True</property><property name=\"fill\">True</property><property name=\"position\">1</property></packing></child></object><packing><property name=\"expand\">False</property><property name=\"fill\">False</property><property name=\"position\">1</property></packing></child><child><object class=\"GtkLabel\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"valign\">start</property><property name=\"margin_top\">19</property></object><packing><property name=\"expand\">False</property><property name=\"fill\">True</property><property name=\"position\">0</property></packing></child><child><object class=\"GtkGrid\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"row_spacing\">8</property><property name=\"column_spacing\">8</property><child><object class=\"GtkEntry\" id=\"LAUNCHER_NAME\"><property name=\"visible\">True</property><property name=\"can_focus\">True</property><property name=\"hexpand\">True</property><signal name=\"changed\" handler=\"on_name_changed\" swapped=\"no\"/></object><packing><property name=\"left_attach\">1</property><property name=\"top_attach\">0</property></packing></child><child><object class=\"GtkFileChooserButton\" id=\"EXECUTABLE_FILE\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"hexpand\">True</property><property name=\"title\" translatable=\"yes\"/><signal name=\"file-set\" handler=\"on_executable_changed\" swapped=\"no\"/></object><packing><property name=\"left_attach\">1</property><property name=\"top_attach\">1</property></packing></child><child><object class=\"GtkFileChooserButton\" id=\"ICON_FILE\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"hexpand\">True</property><property name=\"title\" translatable=\"yes\"/><signal name=\"file-set\" handler=\"on_icon_changed\" swapped=\"no\"/></object><packing><property name=\"left_attach\">1</property><property name=\"top_attach\">2</property></packing></child><child><object class=\"GtkLabel\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"halign\">end</property><property name=\"label\" translatable=\"yes\">Launcher Name</property><attributes><attribute name=\"weight\" value=\"bold\"/></attributes></object><packing><property name=\"left_attach\">0</property><property name=\"top_attach\">0</property></packing></child><child><object class=\"GtkLabel\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"halign\">end</property><property name=\"label\" translatable=\"yes\">Executable File</property><attributes><attribute name=\"weight\" value=\"bold\"/></attributes></object><packing><property name=\"left_attach\">0</property><property name=\"top_attach\">1</property></packing></child><child><object class=\"GtkLabel\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"halign\">end</property><property name=\"label\" translatable=\"yes\">Icon File</property><attributes><attribute name=\"weight\" value=\"bold\"/></attributes></object><packing><property name=\"left_attach\">0</property><property name=\"top_attach\">2</property></packing></child><child><object class=\"GtkFileChooserButton\" id=\"DESTINATION_FOLDER\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"hexpand\">True</property><property name=\"action\">select-folder</property><property name=\"title\" translatable=\"yes\"/><signal name=\"file-set\" handler=\"on_destination_folder_changed\" swapped=\"no\"/></object><packing><property name=\"left_attach\">1</property><property name=\"top_attach\">3</property></packing></child><child><object class=\"GtkLabel\"><property name=\"visible\">True</property><property name=\"can_focus\">False</property><property name=\"label\" translatable=\"yes\">Destination Folder</property><attributes><attribute name=\"weight\" value=\"bold\"/></attributes></object><packing><property name=\"left_attach\">0</property><property name=\"top_attach\">3</property></packing></child></object><packing><property name=\"expand\">False</property><property name=\"fill\">True</property><property name=\"position\">1</property></packing></child></object></child></object></interface>"
+
+class Handler:
+
+  nameSet = False
+  executableFileSet = False
+  iconFileSet = False
+  destinationFolderSet = False
+
+  def on_Cancel_clicked(self, button):
+    sys.exit()
+
+  def on_executable_changed(self, pWidget):
+    self.executableFileSet = True
+    self.setCreateLauncherButtonState()
+
+  def on_icon_changed(self, pWidget):
+    self.iconFileSet = True
+    self.setCreateLauncherButtonState()
+
+  def on_destination_folder_changed(self, pWidget):
+    self.destinationFolderSet = True
+    self.setCreateLauncherButtonState()
+
+  def on_name_changed(self, pWidget):
+    if( len(pWidget.get_chars(0, -1)) > 0 ):
+      self.nameSet = True
+    else:
+      self.nameSet = False
+    self.setCreateLauncherButtonState()
+
+  def setCreateLauncherButtonState(self):
+    createLaucherButton = builder.get_object("CREATE_LAUNCHER")
+    if( self.nameSet and self.executableFileSet and self.iconFileSet and self.destinationFolderSet):
+      createLaucherButton.set_sensitive(True)
+    else:
+      createLaucherButton.set_sensitive(False)
+
+  def on_create_clicked(self, button):
+    launcherNameWidget = builder.get_object("LAUNCHER_NAME")
+    executableFileWidget = builder.get_object("EXECUTABLE_FILE")
+    iconFileWidget = builder.get_object("ICON_FILE")
+    destinationFolderWidget = builder.get_object("DESTINATION_FOLDER")
+    template = "#!/usr/bin/env xdg-open\n[Desktop Entry]\nVersion=1.0\nType=Application\nTerminal=false\nName=%s\nComment=%s\nExec=%s\nIcon=%s"
+    destinationFileName = "%s/%s.desktop" % (destinationFolderWidget.get_filename(), launcherNameWidget.get_chars(0, -1))
+    fileContent = template % (launcherNameWidget.get_chars(0, -1), launcherNameWidget.get_chars(0, -1), executableFileWidget.get_filename(), iconFileWidget.get_filename())
+    textfile = open(destinationFileName, "w")
+    a = textfile.write(fileContent)
+    textfile.close()
+    sys.exit()
+
+builder = Gtk.Builder()
+# builder.add_from_file("gtkCreateLauncher.min.glade")
+builder.add_from_string(uiGladeDefinition)
+builder.connect_signals(Handler())
+
+createLaucherButton = builder.get_object("CREATE_LAUNCHER")
+createLaucherButton.set_sensitive(False)
+
+window = builder.get_object("MainDialog")
+window.connect("delete-event", Gtk.main_quit)
+window.show_all()
+Gtk.main()

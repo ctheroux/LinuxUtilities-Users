@@ -1,0 +1,45 @@
+#!/bin/bash
+
+##########################################################################################
+#
+# Creates a gnome program launcher.
+#
+##########################################################################################
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT
+# HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# IT IS NOT PERMITTED TO MODIFY THIS COMMENT BLOCK.
+#
+# (c)1998-2021, Claude "Tryphon" Theroux, Montreal, Quebec, Canada
+#
+##########################################################################################
+
+if [ $# -ne 3 ]; then 
+	echo 'Usage:' `basename $0` name executable-file icon-file
+	exit 1
+fi
+
+ICON_DESTINATION=/usr/share/icons/myicons
+LAUNCHER_DESTINATION=/usr/share/applications
+
+NAME=$1
+EXECUTABLE_FILE=$2
+ICON_FILE=$3
+
+sudo mkdir ${ICON_DESTINATION} >& /dev/null
+sudo cp ${ICON_FILE} ${ICON_DESTINATION}
+
+echo '#!/usr/bin/env xdg-open' > ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo '[Desktop Entry]' >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo 'Version=1.0' >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo 'Type=Application' >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo 'Terminal=false' >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo "Exec=${EXECUTABLE_FILE}" >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo "Name=${NAME}" >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo "Comment=${NAME}" >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
+echo "Icon=${ICON_DESTINATION}/`basename ${ICON_FILE}`" >> ${LAUNCHER_DESTINATION}/${NAME}.desktop
